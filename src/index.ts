@@ -38,14 +38,28 @@ export function formatTallyDate(value: string | Date): string {
   if (value instanceof Date) {
     if (Number.isNaN(value.getTime())) throw new TypeError("Invalid date");
     const year = value.getUTCFullYear();
+    if (year < 1 || year > 9999) throw new TypeError("Date year must be between 0001 and 9999");
     const month = String(value.getUTCMonth() + 1).padStart(2, "0");
     const day = String(value.getUTCDate()).padStart(2, "0");
-    return `${year}${month}${day}`;
+    return `${String(year).padStart(4, "0")}${month}${day}`;
   }
-  if (/^\d{8}$/.test(value)) return value;
-  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  if (!match) throw new TypeError("Date must be YYYY-MM-DD, YYYYMMDD, or a Date");
-  return `${match[1]}${match[2]}${match[3]}`;
+  const compact = /^\d{8}$/.test(value)
+    ? value
+    : value.match(/^(\d{4})-(\d{2})-(\d{2})$/)?.slice(1).join("");
+  if (!compact) throw new TypeError("Date must be YYYY-MM-DD, YYYYMMDD, or a Date");
+
+  const year = Number(compact.slice(0, 4));
+  const month = Number(compact.slice(4, 6));
+  const day = Number(compact.slice(6, 8));
+  if (year < 1 || month < 1 || month > 12 || day < 1 || day > daysInMonth(year, month)) {
+    throw new TypeError(`Invalid calendar date: ${value}`);
+  }
+  return compact;
+}
+
+function daysInMonth(year: number, month: number): number {
+  if (month === 2) return year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0) ? 29 : 28;
+  return [4, 6, 9, 11].includes(month) ? 30 : 31;
 }
 
 export function buildExportRequest(request: ExportRequest): string {
