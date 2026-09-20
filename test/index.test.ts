@@ -45,3 +45,17 @@ test("summarizes successful and failed responses", () => {
   assert.equal(failure.success, false);
   assert.throws(() => assertSuccessful(failure), /Invalid & blocked/);
 });
+
+test("preserves and reports every line error", () => {
+  const failure = parseTallyResponse(`
+    <RESPONSE>
+      <ERRORS>2</ERRORS>
+      <LINEERROR>Voucher 1: Invalid &amp; blocked</LINEERROR>
+      <LINEERROR>Voucher 2: Amount &lt; zero</LINEERROR>
+    </RESPONSE>
+  `);
+  assert.equal(failure.success, false);
+  assert.equal(failure.lineError, "Voucher 1: Invalid & blocked");
+  assert.deepEqual(failure.lineErrors, ["Voucher 1: Invalid & blocked", "Voucher 2: Amount < zero"]);
+  assert.throws(() => assertSuccessful(failure), /Voucher 1[\s\S]*Voucher 2/);
+});

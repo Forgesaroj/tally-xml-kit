@@ -28,7 +28,7 @@ const summary = parseTallyResponse(await response.text());
 - `formatTallyDate(value)` — validate a real Gregorian calendar date and return `YYYYMMDD` from a `Date`, `YYYY-MM-DD`, or `YYYYMMDD`.
 - `buildExportRequest(options)` — build an `Export / Data` envelope with static variables.
 - `buildImportRequest(options)` — wrap caller-owned Tally message XML in an import envelope.
-- `parseTallyResponse(xml)` — summarize status, counters, voucher ID, and line error.
+- `parseTallyResponse(xml)` — summarize status, counters, voucher ID, and every line error. The first remains available as `lineError`; the complete list is in `lineErrors`.
 - `assertSuccessful(summary)` — throw when the summarized response failed.
 
 ## Important boundaries
