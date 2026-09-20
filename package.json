@@ -1,0 +1,16 @@
+{
+  "name": "@forgesaroj/tally-xml-kit",
+  "version": "0.1.0",
+  "description": "Small typed toolkit for building and inspecting TallyPrime XML envelopes.",
+  "type": "module",
+  "exports": "./src/index.ts",
+  "types": "./src/index.ts",
+  "files": ["src"],
+  "scripts": {
+    "test": "node --experimental-strip-types --test test/*.test.ts",
+    "check": "node --experimental-strip-types --check src/index.ts"
+  },
+  "engines": { "node": ">=22.6" },
+  "keywords": ["tallyprime", "tally", "xml", "erp", "typescript"],
+  "license": "MIT"
+}

@@ -1,0 +1,14 @@
+name: Tally XML bug
+description: Report a reproducible envelope or response parsing issue
+title: "bug: "
+labels: [bug]
+body:
+  - type: textarea
+    attributes: { label: Tally workflow and version }
+    validations: { required: true }
+  - type: textarea
+    attributes: { label: Redacted request and response, description: Remove company data, PANs, credentials, ledgers, and voucher details. }
+    validations: { required: true }
+  - type: textarea
+    attributes: { label: Expected behavior }
+    validations: { required: true }
