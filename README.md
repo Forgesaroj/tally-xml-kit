@@ -25,7 +25,7 @@ const summary = parseTallyResponse(await response.text());
 ## API
 
 - `escapeXml(value)` — escape XML text values.
-- `formatTallyDate(value)` — return `YYYYMMDD` from a `Date`, `YYYY-MM-DD`, or `YYYYMMDD`.
+- `formatTallyDate(value)` — validate a real Gregorian calendar date and return `YYYYMMDD` from a `Date`, `YYYY-MM-DD`, or `YYYYMMDD`.
 - `buildExportRequest(options)` — build an `Export / Data` envelope with static variables.
 - `buildImportRequest(options)` — wrap caller-owned Tally message XML in an import envelope.
 - `parseTallyResponse(xml)` — summarize status, counters, voucher ID, and line error.

@@ -9,7 +9,14 @@ test("escapes XML metacharacters", () => {
 test("formats supported date inputs", () => {
   assert.equal(formatTallyDate("2026-09-20"), "20260920");
   assert.equal(formatTallyDate("20260920"), "20260920");
+  assert.equal(formatTallyDate("2024-02-29"), "20240229");
   assert.equal(formatTallyDate(new Date("2026-09-20T00:00:00Z")), "20260920");
+});
+
+test("rejects impossible calendar dates", () => {
+  for (const value of ["2026-02-29", "20260231", "2026-13-01", "0000-01-01"]) {
+    assert.throws(() => formatTallyDate(value), /Invalid calendar date/);
+  }
 });
 
 test("builds escaped export envelopes", () => {
