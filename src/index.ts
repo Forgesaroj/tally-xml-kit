@@ -22,6 +22,7 @@ export type TallyResponseSummary = {
   exceptions: number;
   lastVoucherId?: string;
   lineError?: string;
+  lineErrors?: string[];
   success: boolean;
 };
 
@@ -95,6 +96,9 @@ export function buildImportRequest(request: ImportRequest): string {
 export function parseTallyResponse(xml: string): TallyResponseSummary {
   if (!xml?.trim()) throw new TypeError("XML response is required");
   const statusText = first(xml, "STATUS");
+  const lineErrors = all(xml, "LINEERROR")
+    .map((value) => decodeXml(value))
+    .filter((value): value is string => Boolean(value));
   const summary: TallyResponseSummary = {
     status: statusText === undefined ? undefined : numeric(statusText),
     created: count(xml, "CREATED"),
@@ -104,14 +108,18 @@ export function parseTallyResponse(xml: string): TallyResponseSummary {
     cancelled: count(xml, "CANCELLED"),
     exceptions: count(xml, "EXCEPTIONS"),
     lastVoucherId: first(xml, "LASTVCHID"),
-    lineError: decodeXml(first(xml, "LINEERROR"))
+    lineError: lineErrors[0],
+    lineErrors
   };
-  summary.success = summary.status !== 0 && summary.errors === 0 && !summary.lineError;
+  summary.success = summary.status !== 0 && summary.errors === 0 && lineErrors.length === 0;
   return summary;
 }
 
 export function assertSuccessful(summary: TallyResponseSummary): void {
-  if (!summary.success) throw new Error(summary.lineError || `Tally request failed with ${summary.errors} error(s)`);
+  if (!summary.success) {
+    const detail = summary.lineErrors?.length ? summary.lineErrors.join("\n") : summary.lineError;
+    throw new Error(detail || `Tally request failed with ${summary.errors} error(s)`);
+  }
 }
 
 function tag(name: string, value: unknown): string {
@@ -125,6 +133,11 @@ function compact(xml: string): string {
 function first(xml: string, tagName: string): string | undefined {
   const match = xml.match(new RegExp(`<${tagName}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${tagName}>`, "i"));
   return match?.[1]?.trim();
+}
+
+function all(xml: string, tagName: string): string[] {
+  const pattern = new RegExp(`<${tagName}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${tagName}>`, "gi");
+  return [...xml.matchAll(pattern)].map((match) => match[1]?.trim() ?? "");
 }
 
 function count(xml: string, tagName: string): number {
